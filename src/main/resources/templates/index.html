@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <title  th:text="${title_message}">Timesheet Mgmt System</title>
+
+    <title>Spring Security Tutorial</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body class="container-fluid">
+         <td th:switch="${homepage_display}">
+            <div th:case="'DASHBOARD'">
+               <h3>User Dashboard | <small class="text-muted">Welcome <span th:text="${user.name}"></span></small>
+               </h3>
+               <table class="table">
+                  <tbody>
+                    <tr>
+                      <th scope="row"></th>
+                      <td>First Name</td>
+                      <td th:text =${user.name}>-</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"></th>
+                      <td>Last Name</td>
+                      <td th:text =${user.lastName}>-</td>
+                    </tr>
+                    <tr>
+                     <th scope="row"></th>
+                     <td>Email</td>
+                     <td th:text =${user.email}>-</td>
+                   </tr>
+                   <tr>
+                     <th scope="row"></th>
+                     <td>Role</td>
+                     <td>
+                       <span th:each="role : ${user.roles}">
+                        <p th:text="${role.role}"></p>
+                       </span>
+                     </td>
+                   </tr>
+                  </tbody>
+                </table>
+            </div>
+            <div th:case="*">
+               <p>Default Homepage.</p>
+            </div>
+        </td>
+</body>
+</html>
