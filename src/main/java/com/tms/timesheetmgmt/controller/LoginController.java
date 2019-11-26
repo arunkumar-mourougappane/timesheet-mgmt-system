@@ -30,6 +30,7 @@ public class LoginController {
     public ModelAndView home(Authentication authentication){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index");
+        modelAndView.addObject("title_message","Timesheet Management System");
         if(authentication != null)
         {
             if(authentication.isAuthenticated())
