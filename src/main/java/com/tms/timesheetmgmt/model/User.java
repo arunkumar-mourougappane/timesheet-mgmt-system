@@ -9,6 +9,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
 import java.util.Set;
 
 @Data
@@ -31,12 +33,19 @@ public class User {
     @Length(min = 5, message = "*Your password must have at least 5 characters")
     @NotEmpty(message = "*Please provide your password")
     private String password;
-    @Column(name = "name")
+    @Column(name = "first_name")
     @NotEmpty(message = "*Please provide your name")
-    private String name;
+    private String firstName;
     @Column(name = "last_name")
     @NotEmpty(message = "*Please provide your last name")
     private String lastName;
+    @Column(name = "home_address")
+    @NotEmpty(message = "*Please provide your home address")
+    private String homeAddress;
+    @Column(name = "mobile_number")
+    @NotEmpty(message = "*Please provide your mobile contact number")
+    @Pattern(regexp = "^\\(\\d{10}\\)|(([\\(]?([0-9]{3})[\\)]?)?[ \\.\\-]?([0-9]{3})[ \\.\\-]([0-9]{4}))$", message = "*Please provide mobile number of an accepted format.")
+    private String mobileNumber;
     @Column(name = "active")
     private int active;
     @ManyToMany(cascade = CascadeType.ALL)
