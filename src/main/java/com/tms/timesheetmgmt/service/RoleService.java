@@ -6,27 +6,26 @@ import java.util.Map;
 import com.tms.timesheetmgmt.model.Role;
 import com.tms.timesheetmgmt.repository.RoleRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service("roleService")
-public class RoleService{
+public class RoleService
+{
 
     private RoleRepository roleRepository;
-
+    @Autowired
+    public RoleService(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
     public Role findByRole (final String role) {
         return roleRepository.findByRole(role);
     }
     
-    public Map<Integer,String> getAllRoles()
+    public List<Role> getAllRoles()
     {
-        Map<Integer,String> allRoles  = new HashMap<Integer,String>();
-        List<Role> allRoleList = roleRepository.findAll();
-        for (Role roleData : allRoleList)
-        {
-            allRoles.put(roleData.getId(), roleData.getRole());
-        }
-        return allRoles;
+        return roleRepository.findAll();
     }
 }

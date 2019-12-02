@@ -15,14 +15,14 @@
 <body class="container-fluid">
          <td th:switch="${homepage_display}">
             <div th:case="'DASHBOARD'">
-               <h3>User Dashboard | <small class="text-muted">Welcome <span th:text="${user.name}"></span></small>
+               <h3>User Dashboard | <small class="text-muted">Welcome <span th:text="${user.firstName}"></span></small>
                </h3>
                <table class="table">
                   <tbody>
                     <tr>
                       <th scope="row"></th>
                       <td>First Name</td>
-                      <td th:text =${user.name}>-</td>
+                      <td th:text =${user.firstName}>-</td>
                     </tr>
                     <tr>
                       <th scope="row"></th>
@@ -37,11 +37,7 @@
                    <tr>
                      <th scope="row"></th>
                      <td>Role</td>
-                     <td>
-                       <span th:each="role : ${user.roles}">
-                        <p th:text="${role.role}"></p>
-                       </span>
-                     </td>
+                     <td th:text =${user.role.role}>-</td>
                    </tr>
                   </tbody>
                 </table>

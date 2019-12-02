@@ -16,7 +16,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <form autocomplete="off" action="#" th:action="@{/registration}"
+            <form autocomplete="off" action="#" th:action="@{/add-employee}"
                   th:object="${user}" method="post" class="form-horizontal"
                   role="form">
                 <h2>Registration Form</h2>
@@ -67,6 +67,15 @@
                                class="validation-message"></label>
                         <input type="text" th:field="*{mobileNumber}"
                                placeholder="Mobile Number" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-9">
+                        <label th:if="${#fields.hasErrors('role')}" th:errors="*{role}" class="validation-message"></label>
+                        <select class="form-control" th:field="*{role}">
+                            <option value="">Role</option>
+                            <option th:each="userRole : ${userRoles}" th:value="${userRole.role}" th:utext="${userRole.role}"/>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">
