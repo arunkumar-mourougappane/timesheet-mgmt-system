@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -26,7 +27,7 @@ public class LoginController {
 
     @Autowired
     private RoleService roleService;
-
+    
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public ModelAndView login(){
         ModelAndView modelAndView = new ModelAndView();
@@ -53,13 +54,104 @@ public class LoginController {
 
 
     @RequestMapping(value="/add-employee", method = RequestMethod.GET)
-    public ModelAndView employeRegPage()
+    public ModelAndView employeeRegPage()
     {
         ModelAndView modelAndView = new ModelAndView();
         UserDao user = new UserDao();
         modelAndView.addObject("userRoles", roleService.getAllRoles());
         modelAndView.addObject("user", user);
         modelAndView.setViewName("add-employee");
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value="/edit-employee-by-id", method = RequestMethod.GET)
+    public ModelAndView editEmployeePage(@RequestParam("employeeId") Long employeeId, Authentication authentication)
+    {
+        ModelAndView modelAndView = new ModelAndView();
+        boolean isAdmin = false;
+        boolean isManager = false;
+        if(authentication!= null)
+        {
+           Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+           for (GrantedAuthority grantedAuthority : authorities){
+                if (grantedAuthority.getAuthority().equals("Admin")) {
+                    isAdmin = true;
+                    break;
+                }else if (grantedAuthority.getAuthority().equals("Manager")) {
+                    isManager = true;
+                    break;
+                }
+            }
+        }
+        if(isAdmin)
+        {
+            UserDao employeeDao = new UserDao();
+            User employee = new User();
+            employee = userService.findUserById(employeeId);
+            if(employee != null)
+            {
+                employeeDao=UserDao.builder()
+                    .id(employeeId)
+                    .firstName(employee.getFirstName())
+                    .lastName(employee.getLastName())
+                    .email(employee.getEmail())
+                    .password(employee.getPassword())
+                    .homeAddress(employee.getHomeAddress())
+                    .mobileNumber(employee.getMobileNumber())
+                    .active(employee.getActive())
+                    .role(employee.getRole().getRole())
+                    .build();
+                    modelAndView.addObject("user", employeeDao);
+                    modelAndView.addObject("userRoles", roleService.getAllRoles());
+                    modelAndView.setViewName("edit-employee");
+            }
+            else
+            {
+                modelAndView.setViewName("index");
+            }
+        }
+        else
+        {
+            modelAndView.setViewName("access-denied");
+        }
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value="/access-denied", method = RequestMethod.GET)
+    public ModelAndView accessDenied()
+    {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("denied_message", "Sorry, You need to be logged in to access this page.");
+        modelAndView.setViewName("access-denied");
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/edit-employee", method = RequestMethod.POST)
+    public ModelAndView updateEmployee(@Valid UserDao user, Authentication authentication, BindingResult bindingResult) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        System.out.println(user.toString());
+        User updatedUser=User.builder()
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .password(user.getPassword())
+            .homeAddress(user.getHomeAddress())
+            .mobileNumber(user.getMobileNumber())
+            .active(user.getActive())
+            .role(roleService.findByRole(user.getRole()))
+            .build();
+        if(userService.updateEmployee(updatedUser) != null)
+        {
+            modelAndView.setViewName("index");
+        }
+        modelAndView.addObject("status_message", "Successfully Updated details of "+updatedUser.getFirstName());
+        modelAndView.addObject("user", user);
+        modelAndView.addObject("userRoles", roleService.getAllRoles());
+        modelAndView.setViewName("edit-employee");
         return modelAndView;
     }
 

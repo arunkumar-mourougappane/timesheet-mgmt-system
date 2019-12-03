@@ -41,13 +41,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
+    protected void configure(HttpSecurity http) throws Exception 
+    {
         http.
                 authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/add-employee").permitAll()
+                .antMatchers("/login","/access-denied").permitAll()
+                .antMatchers("/add-employee","edit-employee*").hasAnyAuthority("Admin","Manager")
                 .antMatchers("/admin/**").hasAuthority("Admin")
                 .antMatchers("/manager/**").hasAuthority("Manager").anyRequest()
                 .authenticated().and().csrf().disable().formLogin()

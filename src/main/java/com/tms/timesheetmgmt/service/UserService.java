@@ -37,5 +37,32 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
+    public User updateEmployee(User employee) {
+        User employeeOldData  = findUserByEmail(employee.getEmail());
+        if(employeeOldData == null)
+        {
+            return saveUser(employee);
+        }
+        else
+        {
+            String oldPassHashed = employeeOldData.getPassword();
+            if(oldPassHashed != null)
+            {
+                if(employee.getPassword().equals(oldPassHashed))
+                {
+                    userRepository.save(employee);
+                }
+                else
+                {
+                    employee.setPassword(bCryptPasswordEncoder.encode(employee.getPassword()));
+                }
+            }
+            else
+            {
+                employee.setPassword(bCryptPasswordEncoder.encode(employee.getPassword()));
+            }
+            System.out.println("User Updated.");
+            return userRepository.save(employee);
+        }
+    }
 }
