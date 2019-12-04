@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 @Service("userService")
 public class UserService {
@@ -64,5 +65,13 @@ public class UserService {
             System.out.println("User Updated.");
             return userRepository.save(employee);
         }
+    }
+    public List<User> findInActiveUsers()
+    {
+        return userRepository.findByActiveFalse();
+    }
+    public List<User> findActiveUsers()
+    {
+        return userRepository.findByActiveTrue();
     }
 }

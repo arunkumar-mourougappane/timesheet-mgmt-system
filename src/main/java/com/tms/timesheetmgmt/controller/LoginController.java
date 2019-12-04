@@ -1,6 +1,7 @@
 package com.tms.timesheetmgmt.controller;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.log4j.Log4j2;
+
 @Controller
+@Log4j2
 public class LoginController {
 
     @Autowired
@@ -40,6 +44,8 @@ public class LoginController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index");
         modelAndView.addObject("title_message","Timesheet Management System");
+        Boolean isAdmin=false;
+        Boolean isManager=false;
         if(authentication != null)
         {
             if(authentication.isAuthenticated())
@@ -47,6 +53,28 @@ public class LoginController {
                 User user = userService.findUserByEmail(authentication.getName());
                 modelAndView.addObject("user",user);
                 modelAndView.addObject("homepage_display","DASHBOARD");
+
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                for (GrantedAuthority grantedAuthority : authorities)
+                {
+                    if (grantedAuthority.getAuthority().equals("Admin"))
+                    {
+                        isAdmin = true;
+                        break;
+                    }
+                    else if (grantedAuthority.getAuthority().equals("Manager"))
+                    {
+                        isManager = true;
+                        break;
+                    }
+                }
+                if(isAdmin)
+                {
+                    List<User> inactiveUsers = userService.findInActiveUsers();
+                    modelAndView.addObject("inactiveEmployees", inactiveUsers);
+                    List<User> activeUsers = userService.findActiveUsers();
+                    modelAndView.addObject("activeEmployees", activeUsers);
+                }
             }
         }
         return modelAndView;
@@ -99,7 +127,7 @@ public class LoginController {
                     .password(employee.getPassword())
                     .homeAddress(employee.getHomeAddress())
                     .mobileNumber(employee.getMobileNumber())
-                    .active(employee.getActive())
+                    .active(employee.isActive())
                     .role(employee.getRole().getRole())
                     .build();
                     modelAndView.addObject("user", employeeDao);
@@ -141,7 +169,7 @@ public class LoginController {
             .password(user.getPassword())
             .homeAddress(user.getHomeAddress())
             .mobileNumber(user.getMobileNumber())
-            .active(user.getActive())
+            .active(user.isActive())
             .role(roleService.findByRole(user.getRole()))
             .build();
         if(userService.updateEmployee(updatedUser) != null)
@@ -168,6 +196,8 @@ public class LoginController {
                             "There is already a user registered with the email provided");
         }
         if (bindingResult.hasErrors()) {
+            modelAndView.addObject("message",bindingResult.getFieldErrors().toString() );
+            modelAndView.addObject("user", user);
             modelAndView.setViewName("add-employee");
         }
         else 
@@ -180,7 +210,7 @@ public class LoginController {
                     .password(user.getPassword())
                     .homeAddress(user.getHomeAddress())
                     .mobileNumber(user.getMobileNumber())
-                    .active(0)
+                    .active(false)
                     .role(roleService.findByRole(user.getRole()))
                     .build();
             if(authentication!= null)
@@ -197,15 +227,15 @@ public class LoginController {
                 }
                if(isAdmin)
                {
-                   newUser.setActive(1);
+                   newUser.setActive(true);
                }
                else
                {
-                   newUser.setActive(0);
+                   newUser.setActive(false);
                }
             }
             userService.saveUser(newUser);
-            modelAndView.addObject("successMessage", "User has been registered successfully");
+            modelAndView.addObject("message", "User has been registered successfully");
             modelAndView.addObject("userRoles", roleService.getAllRoles());
             modelAndView.addObject("user", new User());
             modelAndView.setViewName("add-employee");

@@ -58,7 +58,7 @@ public class User {
     @Pattern(regexp = "^\\(\\d{10}\\)|(([\\(]?([0-9]{3})[\\)]?)?[ \\.\\-]?([0-9]{3})[ \\.\\-]([0-9]{4}))$", message = "*Please provide mobile number of an accepted format.")
     private String mobileNumber;
     @Column(name = "active")
-    private int active;
+    private boolean active;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role role;

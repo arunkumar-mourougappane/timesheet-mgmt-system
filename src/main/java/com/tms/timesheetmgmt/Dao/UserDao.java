@@ -37,7 +37,7 @@ public class UserDao
    @NotEmpty(message = "*Please provide your mobile contact number")
    @Pattern(regexp = "^\\(\\d{10}\\)|(([\\(]?([0-9]{3})[\\)]?)?[ \\.\\-]?([0-9]{3})[ \\.\\-]([0-9]{4}))$", message = "*Please provide mobile number of an accepted format.")
    private String mobileNumber;
-   private int active;
+   private boolean active;
    @NotEmpty(message = "Role Cannot be empty.")
    private String role;
 

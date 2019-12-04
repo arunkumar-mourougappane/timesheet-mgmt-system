@@ -9,16 +9,22 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-<form th:action="@{/}" method="get">
-    <button class="btn btn-md btn-warning btn-block" type="Submit">Go To Login Page</button>
-</form>
-
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
+            <!-- <div class="alert alert-success" role="alert" th:utext="${successMessage}">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div> -->
             <form autocomplete="off" action="#" th:action="@{/add-employee}"
                   th:object="${user}" method="post" class="form-horizontal"
                   role="form">
+                  <div class="alert alert-warning alert-dismissible fade show" role="alert" th:text="${message}">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
                 <h2>Registration Form</h2>
                 <div class="form-group">
                     <div class="col-sm-9">
@@ -83,9 +89,6 @@
                         <button type="submit" class="btn btn-primary btn-block">Register User</button>
                     </div>
                 </div>
-
-                <h2><span class="text-success" th:utext="${successMessage}"></span></h2>
-
             </form>
         </div>
     </div>

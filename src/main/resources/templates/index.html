@@ -1,50 +1,115 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-   <title  th:text="${title_message}">Timesheet Management System</title>
+  <title th:text="${title_message}">Timesheet Management System</title>
 
-    <title>Spring Security Tutorial</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <title>Spring Security Tutorial</title>
+  <!-- <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" /> -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </head>
 
-<body class="container-fluid">
-         <td th:switch="${homepage_display}">
-            <div th:case="'DASHBOARD'">
-               <h3>User Dashboard | <small class="text-muted">Welcome <span th:text="${user.firstName}"></span></small>
-               </h3>
-               <table class="table">
-                  <tbody>
-                    <tr>
-                      <th scope="row"></th>
-                      <td>First Name</td>
-                      <td th:text =${user.firstName}>-</td>
-                    </tr>
-                    <tr>
-                      <th scope="row"></th>
-                      <td>Last Name</td>
-                      <td th:text =${user.lastName}>-</td>
-                    </tr>
-                    <tr>
-                     <th scope="row"></th>
-                     <td>Email</td>
-                     <td th:text =${user.email}>-</td>
-                   </tr>
-                   <tr>
-                     <th scope="row"></th>
-                     <td>Role</td>
-                     <td th:text =${user.role.role}>-</td>
-                   </tr>
-                  </tbody>
-                </table>
-            </div>
-            <div th:case="*">
-               <p>Default Homepage.</p>
-            </div>
-        </td>
+<body class="container" style="background-color: #343a40; text-decoration-color: white;">
+  <td th:switch="${homepage_display}">
+    <div th:case="'DASHBOARD'">
+    </br>
+      <p class="h3" style="color: white;">User Dashboard | Welcome <span th:text="${user.firstName}"></span>
+      </p>
+      <table class="table table-dark">
+        <tbody>
+          <tr>
+            <th scope="row"></th>
+            <td>First Name</td>
+            <td th:text=${user.firstName}>-</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Last Name</td>
+            <td th:text=${user.lastName}>-</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Email</td>
+            <td th:text=${user.email}>-</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Role</td>
+            <td th:text=${user.role.role}>-</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="h3" style="color: white;">Inactive Employees</p>
+      <div>
+          <table class="table table-responsive table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">First Name</th>
+                  <th scope="col">Last Name</th>
+                  <th scope="col">e-mail</th>
+                  <th scope="col">Mobile Number</th>
+                  <th scope="col">Active</th>
+                  <th scope="col">Edit</th>
+                  <th scope="col">Enable</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr th:if="${inactiveEmployees==null or inactiveEmployees.empty}">
+                      <td colspan="8"> No inactive employees. </td>
+                  </tr>
+                  <tr th:each="employee : ${inactiveEmployees}">
+                      <th scope="row"><span th:text="${employee.Id}"> </span></th>
+                      <td><span th:text="${employee.firstName}"> </span></td>
+                      <td><span th:text="${employee.lastName}"> </span></td>
+                      <td><span th:text="${employee.email}"> </span></td>
+                      <td><span th:text="${employee.mobileNumber}"> </span></td>
+                      <td><span th:text="${employee.active} ? 'Active' : 'Inactive'"> </span></td>
+                      <td><a th:href="@{/edit-employee-by-id(employeeId=${employee.id})}" alt="edit"><span class='glyphicon glyphicon-pencil'></a></td>
+                      <td><a th:href="@{/activate-employee-by-id(employeeId=${employee.id})}" alt="enable"><span class='glyphicon glyphicon-saved'></a></td>
+                  </tr>
+              </tbody>
+            </table>
+      </div>
+      <p class="h3" style="color: white;">Active Employees<p>
+      <div>
+          <table class="table table-responsive table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">First Name</th>
+                  <th scope="col">Last Name</th>
+                  <th scope="col">e-mail</th>
+                  <th scope="col">Mobile Number</th>
+                  <th scope="col">Active</th>
+                  <th scope="col">Edit</th>
+                  <th scope="col">Disable</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr th:if="${activeEmployees==null or activeEmployees.empty}">
+                      <td colspan="8"> No active employees. </td>
+                  </tr>
+                  <tr th:each="employee : ${activeEmployees}">
+                      <th scope="row"><span th:text="${employee.Id}"> </span></th>
+                      <td><span th:text="${employee.firstName}"> </span></td>
+                      <td><span th:text="${employee.lastName}"> </span></td>
+                      <td><span th:text="${employee.email}"> </span></td>
+                      <td><span th:text="${employee.mobileNumber}"> </span></td>
+                      <td><span th:text="${employee.active} ? 'Active' : 'Inactive'"> </span></td>
+                      <td><a th:href="@{/edit-employee-by-id(employeeId=${employee.id})}" alt="edit"><span class='glyphicon glyphicon-pencil'></a></td>
+                      <td><a th:href="@{/deactivate-employee-by-id(employeeId=${employee.id})}" alt="disable"><span class='glyphicon glyphicon-floppy-remove'></a></td>
+                  </tr>
+              </tbody>
+            </table>
+      </div>
+    </div>
+    <div th:case="*">
+      <p>Default Homepage.</p>
+    </div>
+  </td>
 </body>
 </html>
