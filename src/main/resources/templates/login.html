@@ -1,38 +1,63 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>Spring Security Tutorial</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </head>
-  
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</head>
 
-<body>
-<form th:action="@{/add-employee}" method="get">
-    <button class="btn btn-md btn-warning btn-block" type="Submit">Go To Registration Page</button>
-</form>
 
-<div class="container">
-    <img th:src="@{/images/login.jpg}" class="img-responsive center-block" width="300" height="300" alt="Logo"/>
-    <form th:action="@{/login}" method="POST" class="form-signin">
-        <h3 class="form-signin-heading" th:text="Welcome"></h3>
-        <br/>
+<body style="background-color: #343a40; text-decoration-color: white;">
+    <section id="cover" class="min-vh-100" style="padding: 120px 0 0 0;">
+        <div id="cover-caption">
+            <div class="container">
+                <div class="row text-white">
+                    <div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
+                        <img th:src="@{/images/login.png}" class="img-responsive centered" width=110px height=150px
+                            style="padding: 0 0 10px 0;" />
+                        <h1 class="display-4 py-2 text-truncate">Log in</h1>
+                        <div class="px-2">
+                                <div align="center" th:if="${param.error}" style="display: block;">
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            Email or Password invalid, please verify
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                            <form method="POST" th:action="@{/login}" role="form" class="justify-content-center">
 
-        <input type="text" id="email" name="email" th:placeholder="Email"
-               class="form-control"/> <br/>
-        <input type="password" th:placeholder="Password"
-               id="password" name="password" class="form-control"/> <br/>
-
-        <div align="center" th:if="${param.error}">
-            <p style="font-size: 20; color: #FF1C19;">Email or Password invalid, please verify</p>
+                                <div class="form-group">
+                                    <label class="sr-only">Email</label>
+                                    <input type="text" id="email" name="email" th:placeholder="Email"
+                                        class="form-control" required autofocus />
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only">Password</label>
+                                    <input type="password" th:placeholder="Password" id="password" name="password"
+                                        class="form-control" required />
+                                </div>
+                                <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block" th:text="Login"></button>
+                                <a class="btn btn-primary btn-lg btn-block" th:href="@{/forgot-asssword}" role="button">Forgot Password?</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit"
-                th:text="Login"></button>
-    </form>
-</div>
+    </section>
 </body>
+
 </html>
