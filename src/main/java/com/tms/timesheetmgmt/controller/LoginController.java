@@ -3,6 +3,7 @@ package com.tms.timesheetmgmt.controller;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.tms.timesheetmgmt.Dao.UserDao;
@@ -33,9 +34,10 @@ public class LoginController {
     private RoleService roleService;
     
     @RequestMapping(value="/login", method = RequestMethod.GET)
-    public ModelAndView login(){
+    public ModelAndView login(HttpSession session){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("login");
+        log.info("Login Page Loaded");
         return modelAndView;
     }
 
@@ -50,6 +52,8 @@ public class LoginController {
         {
             if(authentication.isAuthenticated())
             {
+                log.info("User was already logged in, User Dashboard page will be displayed.");
+
                 User user = userService.findUserByEmail(authentication.getName());
                 modelAndView.addObject("user",user);
                 modelAndView.addObject("homepage_display","DASHBOARD");
@@ -70,6 +74,7 @@ public class LoginController {
                 }
                 if(isAdmin)
                 {
+                    log.info("Populating Admin dashboard information.");
                     List<User> inactiveUsers = userService.findInActiveUsers();
                     modelAndView.addObject("inactiveEmployees", inactiveUsers);
                     List<User> activeUsers = userService.findActiveUsers();
@@ -89,9 +94,58 @@ public class LoginController {
         modelAndView.addObject("userRoles", roleService.getAllRoles());
         modelAndView.addObject("user", user);
         modelAndView.setViewName("add-employee");
+        log.info("Load Add Employee Page.");
         return modelAndView;
     }
 
+    @RequestMapping(value="/forgot-password", method = RequestMethod.GET)
+    public ModelAndView forgotPassword(Authentication authentication)
+    {
+        ModelAndView modelAndView = new ModelAndView();
+        String  email = new String();
+        if(authentication!= null)
+        {           
+            if(authentication.isAuthenticated())
+            {
+                log.info("User already logged in. Getting current user info.");
+                email = authentication.getName();
+            }
+        }
+        modelAndView.addObject("email", email);
+        modelAndView.setViewName("forgot-password");
+        log.info("Loading forgot password page.");
+        return modelAndView;
+    }
+
+    @RequestMapping(value="/forgot-password", method = RequestMethod.POST)
+    public ModelAndView changePassword(@RequestParam("email") String email, @RequestParam("password") String password, Authentication authentication)
+    {
+        ModelAndView modelAndView = new ModelAndView();
+        if(email != null)
+        {
+            User employee = userService.findUserByEmail(email);
+            if(employee != null)
+            {
+                log.info("Found a user for the given id: %s", email);
+                employee.setPassword(password);
+                userService.saveUser(employee);
+                modelAndView.addObject("email", email);
+                modelAndView.addObject("success_message", "Password has been updated Successfully!");
+            }
+            else
+            {
+                log.error("Cannot find a user for the given id: %s", email);
+                modelAndView.addObject("failure_message", "No user of that id found!");
+            }
+        }
+        else
+        {
+            log.error("Email id was invalid.");
+            modelAndView.addObject("failure_message", "Invalid email entry!");
+        }
+        modelAndView.setViewName("forgot-password");
+        return modelAndView;
+    }
 
     @RequestMapping(value="/edit-employee-by-id", method = RequestMethod.GET)
     public ModelAndView editEmployeePage(@RequestParam("employeeId") Long employeeId, Authentication authentication)
@@ -101,24 +155,35 @@ public class LoginController {
         boolean isManager = false;
         if(authentication!= null)
         {
-           Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-           for (GrantedAuthority grantedAuthority : authorities){
-                if (grantedAuthority.getAuthority().equals("Admin")) {
-                    isAdmin = true;
-                    break;
-                }else if (grantedAuthority.getAuthority().equals("Manager")) {
-                    isManager = true;
-                    break;
+            if(authentication.isAuthenticated())
+            {
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                for (GrantedAuthority grantedAuthority : authorities)
+                {
+                    if (grantedAuthority.getAuthority().equals("Admin"))
+                    {
+                        log.info("Current user is admin, flag set for admin");
+                        isAdmin = true;
+                        break;
+                    }
+                    else if (grantedAuthority.getAuthority().equals("Manager"))
+                    {
+                        log.info("Current user is manager, flag set for admin");
+                        isManager = true;
+                        break;
+                    }
                 }
             }
         }
         if(isAdmin)
         {
+            log.info("Allowing admin to edit employee info for id: %ld",employeeId);
             UserDao employeeDao = new UserDao();
             User employee = new User();
             employee = userService.findUserById(employeeId);
             if(employee != null)
             {
+                log.info("Populating employee data for page");
                 employeeDao=UserDao.builder()
                     .id(employeeId)
                     .firstName(employee.getFirstName())
@@ -136,11 +201,13 @@ public class LoginController {
             }
             else
             {
+                log.info("Cannot find employee info for id: %ld",employeeId);
                 modelAndView.setViewName("index");
             }
         }
         else
         {
+            log.error("No proper Access to edit employee data for page");
             modelAndView.setViewName("access-denied");
         }
         return modelAndView;
@@ -159,8 +226,32 @@ public class LoginController {
     @RequestMapping(value = "/edit-employee", method = RequestMethod.POST)
     public ModelAndView updateEmployee(@Valid UserDao user, Authentication authentication, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
+        boolean isAdmin = false;
+        boolean isManager = true;
 
-        System.out.println(user.toString());
+        if(authentication!= null)
+        {
+            if(authentication.isAuthenticated())
+            {
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                for (GrantedAuthority grantedAuthority : authorities)
+                {
+                    if (grantedAuthority.getAuthority().equals("Admin"))
+                    {
+                        log.info("Current user is admin, flag set for admin");
+                        isAdmin = true;
+                        break;
+                    }
+                    else if (grantedAuthority.getAuthority().equals("Manager"))
+                    {
+                        log.info("Current user is manager, flag set for admin");
+                        isManager = true;
+                        break;
+                    }
+                }
+            }
+        }
+        log.info("Building user instance information.");
         User updatedUser=User.builder()
             .id(user.getId())
             .firstName(user.getFirstName())
@@ -172,14 +263,21 @@ public class LoginController {
             .active(user.isActive())
             .role(roleService.findByRole(user.getRole()))
             .build();
-        if(userService.updateEmployee(updatedUser) != null)
+            
+        if(isAdmin)
         {
-            modelAndView.setViewName("index");
+            if(userService.updateEmployee(updatedUser) != null)
+            {
+                log.error("Failed to update employee information.");
+                modelAndView.setViewName("index");
+            }
+            modelAndView.addObject("status_message", "Successfully Updated details of "+updatedUser.getFirstName());
+            modelAndView.addObject("user", user);
+            modelAndView.addObject("userRoles", roleService.getAllRoles());
+            modelAndView.setViewName("edit-employee");
         }
-        modelAndView.addObject("status_message", "Successfully Updated details of "+updatedUser.getFirstName());
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("userRoles", roleService.getAllRoles());
-        modelAndView.setViewName("edit-employee");
+        modelAndView.addObject("denied_message", "Sorry, You need to be logged in to access this page.");
+        modelAndView.setViewName("access-denied");
         return modelAndView;
     }
 
@@ -194,6 +292,11 @@ public class LoginController {
             bindingResult
                     .rejectValue("email", "error.user",
                             "There is already a user registered with the email provided");
+            modelAndView.addObject("message", "There is already a user registered with the email provided");
+            log.error("Employee already exists.");
+            modelAndView.addObject("userRoles", roleService.getAllRoles());
+            modelAndView.addObject("user", new User());
+            modelAndView.setViewName("add-employee");
         }
         if (bindingResult.hasErrors()) {
             modelAndView.addObject("message",bindingResult.getFieldErrors().toString() );
@@ -214,31 +317,46 @@ public class LoginController {
                     .role(roleService.findByRole(user.getRole()))
                     .build();
             if(authentication!= null)
-            {
-               Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-               for (GrantedAuthority grantedAuthority : authorities){
-                    if (grantedAuthority.getAuthority().equals("Admin")) {
-                        isAdmin = true;
-                        break;
-                    }else if (grantedAuthority.getAuthority().equals("Manager")) {
-                        isManager = true;
-                        break;
+            {   
+                if(authentication.isAuthenticated() )
+                {
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                for (GrantedAuthority grantedAuthority : authorities){
+                        if (grantedAuthority.getAuthority().equals("Admin")) {
+                            isAdmin = true;
+                            break;
+                        }else if (grantedAuthority.getAuthority().equals("Manager")) {
+                            isManager = true;
+                            break;
+                        }
                     }
                 }
                if(isAdmin)
                {
                    newUser.setActive(true);
+                   userService.saveUser(newUser);
+                   modelAndView.addObject("message", "User has been registered successfully and Activated.");
+                   modelAndView.addObject("userRoles", roleService.getAllRoles());
+                   modelAndView.addObject("user", new User());
+                   modelAndView.setViewName("add-employee");
+               }
+               else if(isManager)
+               {
+                   newUser.setActive(false);
+                   userService.saveUser(newUser);
+                   modelAndView.addObject("message", "User has been registered successfully. Email adimin to activate user.");
+                   modelAndView.addObject("userRoles", roleService.getAllRoles());
+                   modelAndView.addObject("user", new User());
+                   modelAndView.setViewName("add-employee");
                }
                else
                {
-                   newUser.setActive(false);
+                   log.info("Current user doesn't have enough access.");
+                   modelAndView.addObject("denied_message", "Sorry, You need to be logged in to access this page.");
+                   modelAndView.setViewName("access-denied");
                }
             }
-            userService.saveUser(newUser);
-            modelAndView.addObject("message", "User has been registered successfully");
-            modelAndView.addObject("userRoles", roleService.getAllRoles());
-            modelAndView.addObject("user", new User());
-            modelAndView.setViewName("add-employee");
+
 
         }
         return modelAndView;
@@ -265,4 +383,11 @@ public class LoginController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "/error", method = RequestMethod.GET)
+    public ModelAndView errorPage( Authentication authentication, BindingResult bindingResult) 
+    {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("error");
+        return modelAndView;
+    }
 }

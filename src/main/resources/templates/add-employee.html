@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Registration Form</title>
+    <title>Add employee</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/registration.css}"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -12,11 +12,6 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <!-- <div class="alert alert-success" role="alert" th:utext="${successMessage}">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div> -->
             <form autocomplete="off" action="#" th:action="@{/add-employee}"
                   th:object="${user}" method="post" class="form-horizontal"
                   role="form">
@@ -25,7 +20,7 @@
                           <span aria-hidden="true">&times;</span>
                         </button>
                 </div>
-                <h2>Registration Form</h2>
+                <h2>Add employee</h2>
                 <div class="form-group">
                     <div class="col-sm-9">
                         <label th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"

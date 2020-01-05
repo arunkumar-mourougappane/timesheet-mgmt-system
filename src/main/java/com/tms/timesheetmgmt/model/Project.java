@@ -47,6 +47,5 @@ public class Project {
    @NotEmpty(message = "*Please provide an project budget")
    @Column(name = "project_budget")
    private Float projectBudget;
-   
 
 }

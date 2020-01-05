@@ -13,22 +13,24 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class TimesheetMgmtAppTests {
+class TimesheetMgmtAppTests
+{
 
-	@Autowired
-	private LoginController logincontroller;
-	
+    @Autowired
+    private LoginController logincontroller;
+    
     @LocalServerPort
     private int port;
 
     @Autowired
     private TestRestTemplate restTemplate;
-	@Test
-	void contextLoads() {
-		assertNotNull(logincontroller);
-	}
 
-	@Test
+    @Test
+    void contextLoads() {
+        assertNotNull(logincontroller);
+    }
+
+    @Test
     public void greetingShouldReturnDefaultMessage() throws Exception {
         assertTrue(this.restTemplate.getForObject("http://localhost:" + port + "/",String.class).contains("Timesheet Management System"));
     }

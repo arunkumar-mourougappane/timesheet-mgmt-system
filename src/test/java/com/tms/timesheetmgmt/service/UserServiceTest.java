@@ -1,6 +1,7 @@
 package com.tms.timesheetmgmt.service;
 
 import com.tms.timesheetmgmt.model.User;
+import com.tms.timesheetmgmt.repository.ProjectRepository;
 import com.tms.timesheetmgmt.repository.RoleRepository;
 import com.tms.timesheetmgmt.repository.UserRepository;
 import org.junit.Before;
@@ -23,6 +24,8 @@ public class UserServiceTest {
     @Mock
     private RoleRepository mockRoleRepository;
     @Mock
+    private ProjectRepository mockProjectRepository;
+    @Mock
     private BCryptPasswordEncoder mockBCryptPasswordEncoder;
 
     private UserService userServiceUnderTest;
@@ -33,6 +36,7 @@ public class UserServiceTest {
         initMocks(this);
         userServiceUnderTest = new UserService(mockUserRepository,
                                                mockRoleRepository,
+                                               mockProjectRepository,
                                                mockBCryptPasswordEncoder);
         user = User.builder()
                 .id(1L)
