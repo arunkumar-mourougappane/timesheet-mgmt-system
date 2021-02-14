@@ -1,0 +1,10 @@
+language: java
+jdk: openjdk14
+
+services:
+  - mysql
+
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS `timesheet-mgmt-system`;
+              CREATE USER "amouroug"@"localhost" IDENTIFIED BY "FullMetalAlchemist#8";
+              GRANT ALL PRIVILEGES ON `timesheet-mgmt-system`.* TO "amouroug"@"localhost";'
